@@ -6,6 +6,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
@@ -22,8 +23,6 @@ import kotlinx.coroutines.delay
 @Composable
 fun ProductListScreen(navController: NavController) {
     var searchQuery by remember { mutableStateOf("") }
-
-    // 🌟 Horizontal animation state
     val offsetX = remember { Animatable(-300f) }
 
     LaunchedEffect(Unit) {
@@ -37,7 +36,6 @@ fun ProductListScreen(navController: NavController) {
         }
     }
 
-    // Filter your existing dummyProducts based on the search query
     val filteredProducts = remember(searchQuery) {
         if (searchQuery.isNotBlank()) {
             dummyProducts.filter {
@@ -51,62 +49,66 @@ fun ProductListScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(horizontal = 20.dp, vertical = 10.dp)
     ) {
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-        // Main Title
         Text(
             text = "🛍️ Shop for Products",
-            fontSize = 28.sp,
+            fontSize = 30.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp),
+            modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center
         )
 
-        // Subtitle
         Text(
             text = "Find the best tech gadgets and deals",
             fontSize = 16.sp,
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
             modifier = Modifier
-                .graphicsLayer {
-                    translationX = offsetX.value
-                }
+                .graphicsLayer { translationX = offsetX.value }
                 .fillMaxWidth()
-                .padding(bottom = 16.dp),
+                .padding(bottom = 20.dp),
             textAlign = TextAlign.Center
         )
 
-        // 🔍 Search Bar with Icon Button
-        OutlinedTextField(
-            value = searchQuery,
-            onValueChange = { searchQuery = it },
-            label = { Text("Search Products") },
-            modifier = Modifier.fillMaxWidth(),
-            trailingIcon = {
-                IconButton(onClick = {
-                    // Optional: trigger something on click
-                    println("Search clicked for: $searchQuery")
-                }) {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Search Icon"
-                    )
+        Card(
+            elevation = CardDefaults.cardElevation(6.dp),
+            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                label = { Text("Search Products") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp),
+                shape = RoundedCornerShape(12.dp),
+                trailingIcon = {
+                    IconButton(onClick = {
+                        println("Search clicked for: $searchQuery")
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Search Icon"
+                        )
+                    }
                 }
-            }
-        )
+            )
+        }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         Button(
             onClick = { navController.navigate("cart") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            shape = RoundedCornerShape(24.dp)
         ) {
-            Text("View Cart")
+            Text("View Cart", fontSize = 16.sp)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
