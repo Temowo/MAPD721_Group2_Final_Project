@@ -36,7 +36,12 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import android.widget.Toast
 import androidx.compose.ui.platform.LocalContext
-
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.scaleIn
+import androidx.compose.runtime.LaunchedEffect
+import kotlinx.coroutines.delay
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,6 +54,14 @@ fun ProductDetailScreen(product: Product?, onBack: () -> Unit) {
 
     var quantity by remember { mutableIntStateOf(1) }
 
+    // state to trigger animation
+    var imageVisible by remember { mutableStateOf(false) }
+
+    // Trigger the animation after composition
+    LaunchedEffect(Unit) {
+        delay(300) // small delay before fade-in
+        imageVisible = true
+    }
 
     Scaffold(
         topBar = {
@@ -72,6 +85,13 @@ fun ProductDetailScreen(product: Product?, onBack: () -> Unit) {
                 .padding(16.dp)
         ) {
             product?.let {
+                AnimatedVisibility(
+                    visible = imageVisible,
+                    enter = scaleIn(
+                        animationSpec = tween(durationMillis = 900),
+                        initialScale = 0.8f
+                    )
+                ) {
                 Image(
                     painter = painterResource(id = getImageResource(it.imageName)),
                     contentDescription = it.name,
@@ -80,7 +100,7 @@ fun ProductDetailScreen(product: Product?, onBack: () -> Unit) {
                         .height(300.dp)
                         .clip(RoundedCornerShape(8.dp)),
                     contentScale = ContentScale.Crop
-                )
+                )}
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -96,6 +116,8 @@ fun ProductDetailScreen(product: Product?, onBack: () -> Unit) {
                     text = it.description,
                     style = MaterialTheme.typography.bodyLarge
                 )
+
+                Spacer(modifier = Modifier.height(16.dp))
 
 
                 Row(
