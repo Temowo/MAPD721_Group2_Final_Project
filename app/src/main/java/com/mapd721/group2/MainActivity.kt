@@ -105,9 +105,6 @@ fun ProductApp() {
 
 
 
-
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductCard(product: Product, onClick: () -> Unit) {
