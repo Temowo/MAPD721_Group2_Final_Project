@@ -34,12 +34,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductDetailScreen(product: Product?, onBack: () -> Unit) {
     val db = Firebase.firestore
+
+    val context = LocalContext.current
+
 
     var quantity by remember { mutableIntStateOf(1) }
 
@@ -131,7 +137,10 @@ fun ProductDetailScreen(product: Product?, onBack: () -> Unit) {
                         db.collection("products")
                             .add(newProduct)
                             .addOnSuccessListener {
-
+                                Toast.makeText(context, "Added to cart", Toast.LENGTH_SHORT).show()
+                            }
+                            .addOnFailureListener {
+                                Toast.makeText(context, "Failed to add product", Toast.LENGTH_SHORT).show()
                             }
                     },
                     modifier = Modifier.fillMaxWidth()
