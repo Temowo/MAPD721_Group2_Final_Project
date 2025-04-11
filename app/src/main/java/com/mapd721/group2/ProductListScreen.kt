@@ -3,14 +3,30 @@ package com.mapd721.group2
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
@@ -20,10 +36,14 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 
+
 @Composable
 fun ProductListScreen(navController: NavController) {
     var searchQuery by remember { mutableStateOf("") }
+    // ✨ Animation state
+    // 🌟 Horizontal animation state
     val offsetX = remember { Animatable(-300f) }
+
 
     LaunchedEffect(Unit) {
         while (true) {
@@ -36,6 +56,8 @@ fun ProductListScreen(navController: NavController) {
         }
     }
 
+
+    // Filter your existing dummyProducts based on the search query
     val filteredProducts = remember(searchQuery) {
         if (searchQuery.isNotBlank()) {
             dummyProducts.filter {
@@ -49,67 +71,62 @@ fun ProductListScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 20.dp, vertical = 10.dp)
+            .padding(16.dp)
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
-        Text(
-            text = "🛍️ Shop for Products",
-            fontSize = 30.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary,
+        Row(
             modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center
-        )
+            horizontalArrangement = Arrangement.End
+        ) {
+            IconButton(onClick = { navController.navigate("cart") }) {
+                Icon(
+                    imageVector = Icons.Default.ShoppingCart,
+                    contentDescription = "View Cart",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(32.dp)
+                )
+            }
+            //Main title
+            Text(
+                text = "🛍️ Shop for Products",
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
+                textAlign = TextAlign.Center
+            )
+        }
 
+// Subtitle
         Text(
             text = "Find the best tech gadgets and deals",
             fontSize = 16.sp,
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
             modifier = Modifier
-                .graphicsLayer { translationX = offsetX.value }
+                .graphicsLayer {
+                    translationX = offsetX.value
+                }
                 .fillMaxWidth()
-                .padding(bottom = 20.dp),
+                .padding(bottom = 16.dp),
             textAlign = TextAlign.Center
         )
 
-        Card(
-            elevation = CardDefaults.cardElevation(6.dp),
-            shape = RoundedCornerShape(12.dp),
+
+        // Search Bar (Live Filter)
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = { searchQuery = it },
+            label = { Text("Search Products") },
             modifier = Modifier.fillMaxWidth()
-        ) {
-            OutlinedTextField(
-                value = searchQuery,
-                onValueChange = { searchQuery = it },
-                label = { Text("Search Products") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp),
-                shape = RoundedCornerShape(12.dp),
-                trailingIcon = {
-                    IconButton(onClick = {
-                        println("Search clicked for: $searchQuery")
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Search Icon"
-                        )
-                    }
-                }
-            )
-        }
+        )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
-        Button(
-            onClick = { navController.navigate("cart") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            shape = RoundedCornerShape(24.dp)
-        ) {
-            Text("View Cart", fontSize = 16.sp)
-        }
+
+
 
         Spacer(modifier = Modifier.height(16.dp))
 
