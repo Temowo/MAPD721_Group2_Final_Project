@@ -2,6 +2,7 @@ package com.mapd721.group2
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,6 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import kotlinx.coroutines.delay
 
 
 @Composable
@@ -36,18 +38,18 @@ fun ProductListScreen(navController: NavController) {
     var searchQuery by remember { mutableStateOf("") }
     // ✨ Animation state
     // 🌟 Horizontal animation state
-    val titleOffsetX = remember { Animatable(-300f) }  // starts off to the left
-    val titleAlpha = remember { Animatable(0f) }
+    val offsetX = remember { Animatable(-300f) }  // starts off to the left
+
 
     LaunchedEffect(Unit) {
-        titleOffsetX.animateTo(
-            targetValue = 0f,
-            animationSpec = tween(durationMillis = 700, easing = FastOutSlowInEasing)
-        )
-        titleAlpha.animateTo(
-            targetValue = 1f,
-            animationSpec = tween(durationMillis = 700)
-        )
+        while (true) {
+            offsetX.animateTo(
+                targetValue = 0f,
+                animationSpec = tween(durationMillis = 1500, easing = LinearEasing)
+            )
+            delay(1000)
+            offsetX.snapTo(-300f)
+        }
     }
 
 
@@ -88,8 +90,7 @@ fun ProductListScreen(navController: NavController) {
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
             modifier = Modifier
                 .graphicsLayer {
-                    translationX = titleOffsetX.value
-                    alpha = titleAlpha.value
+                    translationX = offsetX.value
                 }
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
