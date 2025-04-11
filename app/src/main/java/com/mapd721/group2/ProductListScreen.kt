@@ -1,5 +1,8 @@
 package com.mapd721.group2
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -10,21 +13,42 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
 
 @Composable
 fun ProductListScreen(navController: NavController) {
     var searchQuery by remember { mutableStateOf("") }
+    // ✨ Animation state
+    // 🌟 Horizontal animation state
+    val titleOffsetX = remember { Animatable(-300f) }  // starts off to the left
+    val titleAlpha = remember { Animatable(0f) }
+
+    LaunchedEffect(Unit) {
+        titleOffsetX.animateTo(
+            targetValue = 0f,
+            animationSpec = tween(durationMillis = 700, easing = FastOutSlowInEasing)
+        )
+        titleAlpha.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(durationMillis = 700)
+        )
+    }
 
 
     // Filter your existing dummyProducts based on the search query
@@ -44,6 +68,34 @@ fun ProductListScreen(navController: NavController) {
             .padding(16.dp)
     ) {
         Spacer(modifier = Modifier.height(32.dp))
+
+        // Main Title
+        Text(
+            text = "🛍️ Shop for Products",
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp),
+            textAlign = TextAlign.Center
+        )
+
+// Subtitle
+        Text(
+            text = "Find the best tech gadgets and deals",
+            fontSize = 16.sp,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+            modifier = Modifier
+                .graphicsLayer {
+                    translationX = titleOffsetX.value
+                    alpha = titleAlpha.value
+                }
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            textAlign = TextAlign.Center
+        )
+
 
         // Search Bar (Live Filter)
         OutlinedTextField(
