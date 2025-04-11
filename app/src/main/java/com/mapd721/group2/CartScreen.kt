@@ -114,10 +114,6 @@ fun CartScreen(onBack: () -> Unit) {
                 Button(
                     onClick = { showCheckoutDialog = true },
                     modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer,
-                        contentColor = MaterialTheme.colorScheme.onErrorContainer
-                    ),
                     enabled = items.isNotEmpty()
                 ) {
                     Text("CheckOut")
@@ -172,7 +168,7 @@ fun CartScreen(onBack: () -> Unit) {
                         showCheckoutDialog = false
                     }
                 ) {
-                    Text("Delete", color = MaterialTheme.colorScheme.error)
+                    Text("Checkout", color = MaterialTheme.colorScheme.onPrimaryContainer)
                 }
             },
             dismissButton = {
