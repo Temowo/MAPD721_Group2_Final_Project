@@ -1,5 +1,7 @@
 package com.mapd721.group2
 
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,8 +16,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.text.NumberFormat
@@ -31,6 +35,8 @@ fun CartScreen(onBack: () -> Unit) {
     var items by remember { mutableStateOf<List<Item>>(emptyList()) }
     val scope = rememberCoroutineScope()
     var showCheckoutDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    var showWebView by remember { mutableStateOf(false) } // State to control WebView visibility
 
     // Currency formatter
     val currencyFormat = remember {
@@ -155,6 +161,37 @@ fun CartScreen(onBack: () -> Unit) {
         }
     }
 
+
+
+        if (showWebView) {
+
+            AndroidView(
+                factory = { context ->
+                    WebView(context).apply {
+                        webViewClient = object : WebViewClient() {
+                            override fun shouldOverrideUrlLoading(
+                                view: WebView,
+                                url: String
+                            ): Boolean {
+                                if (url.contains("rickie-austin-114.github.io/paypal/success.html")) {
+                                    // Close the WebView and return to the app
+                                    view.visibility =
+                                        android.view.View.GONE // or finish the activity
+                                    return true
+                                }
+                                view.loadUrl(url)
+                                return false
+                            }
+                        }
+                        settings.javaScriptEnabled = true // Enable JavaScript
+                        loadUrl("http://rickie-austin-114.github.io/paypal/index.html?amount=$grandTotal") // Initial URL
+                    }
+                },
+                modifier = Modifier.fillMaxSize()
+
+            )
+        }
+
     // Delete All Confirmation Dialog
     if (showCheckoutDialog) {
         AlertDialog(
@@ -164,6 +201,7 @@ fun CartScreen(onBack: () -> Unit) {
             confirmButton = {
                 TextButton(
                     onClick = {
+                        showWebView = true
                         deleteAllProducts()
                         showCheckoutDialog = false
                     }
@@ -245,3 +283,5 @@ data class Item(
     val total: Float
         get() = price * quantity
 }
+
+
