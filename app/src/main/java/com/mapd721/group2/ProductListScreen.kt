@@ -14,6 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -55,59 +56,73 @@ fun ProductListScreen(navController: NavController) {
             .fillMaxSize()
             .padding(horizontal = 20.dp, vertical = 12.dp)
     ) {
-        // 🔥 Top Section - Logo, Title, Cart
-        Row(
+        // 🔥 Gorgeous Header Section
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+                .padding(bottom = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            // Cart icon aligned top-right
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                IconButton(onClick = { navController.navigate("cart") }) {
+                    Icon(
+                        imageVector = Icons.Default.ShoppingCart,
+                        contentDescription = "Cart",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(26.dp)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Logo & Title
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.shopping_bag), // replace with your logo if needed
+                    painter = painterResource(id = R.drawable.shopping_bag), // replace with your icon
                     contentDescription = "Logo",
-                    tint = MaterialTheme.colorScheme.primary,
+                    tint = Color.Unspecified,
                     modifier = Modifier
-                        .size(32.dp)
+                        .size(40.dp)
                         .padding(end = 8.dp)
                 )
+
                 Text(
                     text = "Shop for Products",
-                    fontSize = 26.sp,
+                    fontSize = 30.sp,
                     fontWeight = FontWeight.ExtraBold,
                     color = MaterialTheme.colorScheme.primary
                 )
             }
 
-            IconButton(onClick = { navController.navigate("cart") }) {
-                Icon(
-                    imageVector = Icons.Default.ShoppingCart,
-                    contentDescription = "Cart",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(28.dp)
-                )
-            }
+            Spacer(modifier = Modifier.height(6.dp))
+
+            Text(
+                text = "Find the best tech gadgets and deals",
+                fontSize = 15.sp,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f),
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .graphicsLayer { translationX = offsetX.value }
+                    .fillMaxWidth()
+            )
         }
 
-        // ✨ Subtitle
-        Text(
-            text = "Find the best tech gadgets and deals",
-            fontSize = 14.sp,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f),
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier
-                .graphicsLayer { translationX = offsetX.value }
-                .fillMaxWidth()
-                .padding(bottom = 20.dp),
-            textAlign = TextAlign.Start
-        )
-
-        // 🔎 Search Bar (stylish)
+        // 🔎 Beautiful Search Bar
         Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(14.dp),
-            elevation = CardDefaults.cardElevation(6.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 24.dp),
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.cardElevation(10.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
         ) {
             OutlinedTextField(
                 value = searchQuery,
@@ -116,19 +131,18 @@ fun ProductListScreen(navController: NavController) {
                 trailingIcon = {
                     Icon(Icons.Default.Search, contentDescription = "Search")
                 },
-                shape = RoundedCornerShape(14.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(4.dp),
+                    .padding(6.dp),
+                shape = RoundedCornerShape(16.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = MaterialTheme.colorScheme.primary,
                     unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                    cursorColor = MaterialTheme.colorScheme.primary
+                    cursorColor = MaterialTheme.colorScheme.primary,
+                    focusedLabelColor = MaterialTheme.colorScheme.primary
                 )
             )
         }
-
-        Spacer(modifier = Modifier.height(24.dp))
 
         // 🛒 Product List
         LazyColumn(
