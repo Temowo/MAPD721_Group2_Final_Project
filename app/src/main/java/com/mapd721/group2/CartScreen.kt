@@ -204,6 +204,7 @@ fun CartScreen(onBack: () -> Unit) {
                         showWebView = true
                         deleteAllProducts()
                         showCheckoutDialog = false
+
                     }
                 ) {
                     Text("Checkout", color = MaterialTheme.colorScheme.onPrimaryContainer)

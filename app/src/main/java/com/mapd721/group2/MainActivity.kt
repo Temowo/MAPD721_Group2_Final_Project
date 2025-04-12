@@ -164,16 +164,3 @@ fun ProductCard(product: Product, onClick: () -> Unit) {
     }
 }
 
-// Helper function to get drawable resource ID
-fun getImageResource(imageName: String): Int {
-    return when (imageName) {
-        "headphones" -> R.drawable.headphones
-        "smartwatch" -> R.drawable.smartwatch
-        "speaker" -> R.drawable.speaker
-        "mouse" -> R.drawable.mouse
-        "keyboard" -> R.drawable.keyboard
-        "ssd" -> R.drawable.ssd
-        "charger" -> R.drawable.charger
-        else -> R.drawable.ic_placeholder
-    }
-}
