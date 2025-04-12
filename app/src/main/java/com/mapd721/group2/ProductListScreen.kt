@@ -14,9 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -56,14 +54,14 @@ fun ProductListScreen(navController: NavController) {
             .fillMaxSize()
             .padding(horizontal = 20.dp, vertical = 12.dp)
     ) {
-        // 🔥 Gorgeous Header Section
+        // 🔥 Header Section with Emoji Icon
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp),
+                .padding(bottom = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Cart icon aligned top-right
+            // Cart icon top right
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
@@ -80,18 +78,15 @@ fun ProductListScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Logo & Title
+            // Title with Emoji icon (no drawable)
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.shopping_bag), // replace with your icon
-                    contentDescription = "Logo",
-                    tint = Color.Unspecified,
-                    modifier = Modifier
-                        .size(40.dp)
-                        .padding(end = 8.dp)
+                Text(
+                    text = "🛒",
+                    fontSize = 36.sp,
+                    modifier = Modifier.padding(end = 8.dp)
                 )
 
                 Text(
@@ -115,7 +110,7 @@ fun ProductListScreen(navController: NavController) {
             )
         }
 
-        // 🔎 Beautiful Search Bar
+        // 🔍 Search Bar
         Card(
             modifier = Modifier
                 .fillMaxWidth()
