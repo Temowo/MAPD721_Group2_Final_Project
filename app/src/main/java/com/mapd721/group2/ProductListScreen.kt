@@ -65,6 +65,8 @@ fun ProductListScreen(navController: NavController) {
                 .padding(bottom = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Spacer(modifier = Modifier.height(8.dp))
+
             // Cart icon top right
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -97,13 +99,13 @@ fun ProductListScreen(navController: NavController) {
 
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
 
             // Title with Emoji icon (no drawable)
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
+
                 Text(
                     text = "🛒",
                     fontSize = 36.sp,

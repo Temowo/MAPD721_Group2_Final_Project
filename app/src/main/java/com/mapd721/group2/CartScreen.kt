@@ -175,6 +175,7 @@ fun CartScreen(onBack: () -> Unit) {
                             ): Boolean {
                                 if (url.contains("rickie-austin-114.github.io/paypal/success.html")) {
                                     // Close the WebView and return to the app
+                                    //deleteAllProducts()
                                     view.visibility =
                                         android.view.View.GONE // or finish the activity
                                     return true
