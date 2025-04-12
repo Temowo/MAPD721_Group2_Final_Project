@@ -1,5 +1,7 @@
 package com.mapd721.group2
 
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,15 +18,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.text.NumberFormat
 import java.util.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,15 +35,17 @@ fun CartScreen(onBack: () -> Unit) {
     var items by remember { mutableStateOf<List<Item>>(emptyList()) }
     val scope = rememberCoroutineScope()
     var showCheckoutDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    var showWebView by remember { mutableStateOf(false) } // State to control WebView visibility
 
-
-
+    // Currency formatter
     val currencyFormat = remember {
         NumberFormat.getCurrencyInstance(Locale.getDefault()).apply {
             maximumFractionDigits = 2
         }
     }
 
+    // Listen for Firestore changes
     LaunchedEffect(Unit) {
         db.collection("products")
             .addSnapshotListener { snapshot, error ->
@@ -59,10 +63,12 @@ fun CartScreen(onBack: () -> Unit) {
             }
     }
 
+    // Calculate grand total
     val grandTotal = remember(items) {
         items.sumOf { it.total.toDouble() }.toFloat()
     }
 
+    // Delete all products
     fun deleteAllProducts() {
         scope.launch {
             try {
@@ -80,14 +86,7 @@ fun CartScreen(onBack: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Text(
-                        text = "Cart Details",
-                        style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
-                    )
-                },
+                title = { "Cart Details" },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
@@ -99,44 +98,54 @@ fun CartScreen(onBack: () -> Unit) {
             )
         }
     ) { paddingValues ->
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
                 .padding(16.dp)
         ) {
-            Spacer(modifier = Modifier.height(8.dp))
 
-            Button(
-                onClick = { showCheckoutDialog = true },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-                shape = RoundedCornerShape(24.dp),
-                enabled = items.isNotEmpty()
-            ) {
-                Text("Check Out")
-            }
+            Spacer(modifier = Modifier.height(paddingValues.calculateTopPadding()))
 
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Card(
+            // Input Section
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                elevation = CardDefaults.cardElevation(4.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(
-                    text = "Total: ${currencyFormat.format(grandTotal)}",
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                    modifier = Modifier.padding(16.dp)
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+
+                    Button(
+                        onClick = { showCheckoutDialog = true },
+                        modifier = Modifier.weight(1f),
+                        enabled = items.isNotEmpty()
+                    ) {
+                        Text("CheckOut")
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+            // Total Price
+            Card(
                 modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "Total: ${currencyFormat.format(grandTotal)}",
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Products List
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(items) { item ->
                     ProductItemRow(
@@ -150,32 +159,68 @@ fun CartScreen(onBack: () -> Unit) {
                     )
                 }
             }
-
-            if (showCheckoutDialog) {
-                AlertDialog(
-                    onDismissRequest = { showCheckoutDialog = false },
-                    title = { Text("Checkout All Products?") },
-                    text = { Text("Make sure you have ordered all the products") },
-                    confirmButton = {
-                        TextButton(
-                            onClick = {
-                                deleteAllProducts()
-                                showCheckoutDialog = false
-                            }
-                        ) {
-                            Text("Checkout")
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { showCheckoutDialog = false }) {
-                            Text("Cancel")
-                        }
-                    }
-                )
-            }
         }
-    }
+
+
+
+        if (showWebView) {
+
+            AndroidView(
+                factory = { context ->
+                    WebView(context).apply {
+                        webViewClient = object : WebViewClient() {
+                            override fun shouldOverrideUrlLoading(
+                                view: WebView,
+                                url: String
+                            ): Boolean {
+                                if (url.contains("rickie-austin-114.github.io/paypal/success.html")) {
+                                    // Close the WebView and return to the app
+                                    view.visibility =
+                                        android.view.View.GONE // or finish the activity
+                                    return true
+                                }
+                                view.loadUrl(url)
+                                return false
+                            }
+                        }
+                        settings.javaScriptEnabled = true // Enable JavaScript
+                        loadUrl("http://rickie-austin-114.github.io/paypal/index.html?amount=$grandTotal") // Initial URL
+                    }
+                },
+                modifier = Modifier.fillMaxSize()
+
+            )
+        }
+
+        // Delete All Confirmation Dialog
+        if (showCheckoutDialog) {
+            AlertDialog(
+                onDismissRequest = { showCheckoutDialog = false },
+                title = { Text("Checkout All Products?") },
+                text = { Text("Make sure you have order all the product") },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            showWebView = true
+                            deleteAllProducts()
+                            showCheckoutDialog = false
+
+                        }
+                    ) {
+                        Text("Checkout", color = MaterialTheme.colorScheme.onPrimaryContainer)
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = { showCheckoutDialog = false }
+                    ) {
+                        Text("Cancel")
+                    }
+                }
+            )
+        }}
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -185,36 +230,34 @@ fun ProductItemRow(
     onDelete: () -> Unit
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-        elevation = CardDefaults.cardElevation(4.dp)
+        modifier = Modifier.fillMaxWidth()
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Image(
                 painter = painterResource(id = getImageResource(item.image)),
-                contentDescription = item.productName,
+                contentDescription = "",
                 modifier = Modifier
-                    .size(60.dp)
-                    .clip(RoundedCornerShape(8.dp)),
+                    .width(40.dp)
+                    .height(40.dp)
+                    .clip(RoundedCornerShape(2.dp)),
                 contentScale = ContentScale.Crop
             )
 
             Column(modifier = Modifier.weight(1f)) {
+
                 Text(
                     text = item.productName,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold
+                    style = MaterialTheme.typography.bodyLarge
                 )
                 Text(
                     text = "${currencyFormat.format(item.price)} × ${item.quantity} = ${currencyFormat.format(item.total)}",
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                 )
             }
@@ -229,7 +272,8 @@ fun ProductItemRow(
         }
     }
 }
-//
+
+// Rest of the code remains the same (Item data class and ProductItemRow composable)
 data class Item(
     val id: String = "",
     val productName: String = "",
@@ -240,3 +284,5 @@ data class Item(
     val total: Float
         get() = price * quantity
 }
+
+
