@@ -1,5 +1,6 @@
 package com.mapd721.group2
 
+import android.content.Intent
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
@@ -8,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
@@ -15,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -27,6 +30,7 @@ import kotlinx.coroutines.delay
 fun ProductListScreen(navController: NavController) {
     var searchQuery by remember { mutableStateOf("") }
     val offsetX = remember { Animatable(-300f) }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         while (true) {
@@ -74,6 +78,23 @@ fun ProductListScreen(navController: NavController) {
                         modifier = Modifier.size(26.dp)
                     )
                 }
+
+                IconButton(
+                    onClick = {
+                        // Intent to launch App 1
+                        val intent = Intent().apply {
+                            action = "com.plcoding.bluetoothchat.OPEN"
+                        }
+                        context.startActivity(intent)
+                    }) {
+                    Icon(
+                        imageVector = Icons.Default.Info,
+                        contentDescription = "View Cart",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
+
             }
 
             Spacer(modifier = Modifier.height(8.dp))
